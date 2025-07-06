@@ -1,0 +1,330 @@
+[
+    {
+        "id": "0c43ec2564d8737a",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "d9fe3e514fe7ad0c",
+        "type": "mqtt-broker",
+        "name": "Mosquitto",
+        "broker": "192.168.1.9",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "463fb552d00e5c2a",
+        "type": "MySQLdatabase",
+        "name": "Elementos",
+        "host": "localhost",
+        "port": "3306",
+        "db": "electronica",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "676dab11e5b136cb",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "192.168.1.11",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "4338bc1e98228210",
+        "type": "mqtt in",
+        "z": "0c43ec2564d8737a",
+        "name": "",
+        "topic": "Disponibilidad",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "d9fe3e514fe7ad0c",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 190,
+        "y": 60,
+        "wires": [
+            [
+                "849bfd81d557cbe4"
+            ]
+        ]
+    },
+    {
+        "id": "c6a5517dfcd1bef3",
+        "type": "mqtt in",
+        "z": "0c43ec2564d8737a",
+        "name": "",
+        "topic": "Abastecer",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "d9fe3e514fe7ad0c",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 180,
+        "y": 220,
+        "wires": [
+            [
+                "6a46ab1d7dfc75b3",
+                "fa939748703619c4"
+            ]
+        ]
+    },
+    {
+        "id": "ed6eece36a13d976",
+        "type": "e-mail",
+        "z": "0c43ec2564d8737a",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "authtype": "BASIC",
+        "saslformat": true,
+        "token": "oauth2Response.access_token",
+        "secure": true,
+        "tls": false,
+        "name": "apolo6155@gmail.com",
+        "dname": "",
+        "x": 600,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "5b3c01d1c9fc9920",
+        "type": "debug",
+        "z": "0c43ec2564d8737a",
+        "name": "reCAPTCHA",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 750,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "6a46ab1d7dfc75b3",
+        "type": "function",
+        "z": "0c43ec2564d8737a",
+        "name": "function 2",
+        "func": "// Verificar si solo se envió el token\nconst payload = msg.payload;\nconst claves = Object.keys(payload);\n\n// Caso 1: Solo recaptcha → devolver null\nif (claves.length === 2 && claves[0] === 'recaptcha') {\n   return null;\n}\nif(payload.nombre === '')\n{\n   return null;\n}\n\n// Caso 2: Contiene nombre, cantidad, etc. → construir mensaje\nmsg.payload = `\nSe ha solicitado el siguiente componente:\n\nNombre: ${payload.nombre}\nCantidad: ${payload.cantidad}\nCorreo: ${payload.correo}\nFecha: ${new Date().toLocaleString()}\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 140,
+        "wires": [
+            [
+                "ed6eece36a13d976",
+                "0511ef10b3ba2129"
+            ]
+        ]
+    },
+    {
+        "id": "fa939748703619c4",
+        "type": "function",
+        "z": "0c43ec2564d8737a",
+        "name": "function 3",
+        "func": "const payload = msg.payload;\nconst claves = Object.keys(payload);\n\nif (claves.length === 2 && claves[0] === 'recaptcha') {\n    msg.payload = {\n        clave: `${msg.payload.recaptcha}`,\n        correo: `${msg.payload.correo}`\n    };\n    return msg;\n}\n\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 280,
+        "wires": [
+            [
+                "ec33cae7f8146656"
+            ]
+        ]
+    },
+    {
+        "id": "ec33cae7f8146656",
+        "type": "http request",
+        "z": "0c43ec2564d8737a",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.9:3000/verify-recaptcha",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "Content-Type",
+                "keyValue": "",
+                "valueType": "other",
+                "valueValue": "application/x-www-form-urlencoded"
+            }
+        ],
+        "x": 570,
+        "y": 280,
+        "wires": [
+            [
+                "80b5074f4cd2c98e",
+                "5b3c01d1c9fc9920"
+            ]
+        ]
+    },
+    {
+        "id": "80b5074f4cd2c98e",
+        "type": "mqtt out",
+        "z": "0c43ec2564d8737a",
+        "name": "",
+        "topic": "Comprobar",
+        "qos": "2",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "d9fe3e514fe7ad0c",
+        "x": 770,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "0511ef10b3ba2129",
+        "type": "debug",
+        "z": "0c43ec2564d8737a",
+        "name": "Correo",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "2a3b0a65ba7ba9f2",
+        "type": "mysql",
+        "z": "0c43ec2564d8737a",
+        "mydb": "463fb552d00e5c2a",
+        "name": "",
+        "x": 850,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "963fb2bc2d6f511f",
+        "type": "function",
+        "z": "0c43ec2564d8737a",
+        "name": "function 1",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 60,
+        "wires": [
+            [
+                "2a3b0a65ba7ba9f2"
+            ]
+        ]
+    },
+    {
+        "id": "849bfd81d557cbe4",
+        "type": "uibuilder",
+        "z": "0c43ec2564d8737a",
+        "name": "",
+        "topic": "",
+        "url": "Dispensador",
+        "okToGo": true,
+        "fwdInMessages": false,
+        "allowScripts": false,
+        "allowStyles": false,
+        "copyIndex": true,
+        "templateFolder": "blank",
+        "extTemplate": "",
+        "showfolder": false,
+        "reload": false,
+        "sourceFolder": "src",
+        "deployedVersion": "7.2.0",
+        "showMsgUib": false,
+        "title": "",
+        "descr": "",
+        "editurl": "vscode://fileC:\\Users\\ricardo\\Desktop\\App\\ProyectoIng3\\uibuilder/Dispensador/?windowId=_blank",
+        "x": 460,
+        "y": 60,
+        "wires": [
+            [
+                "963fb2bc2d6f511f"
+            ],
+            []
+        ]
+    }
+]
